@@ -1,0 +1,16 @@
+{
+  "id": "2602665",
+  "name": "MyProject",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "9307276",
+      "name": "执行",
+      "font_class": "zhihang",
+      "unicode": "e816",
+      "unicode_decimal": 59414
+    }
+  ]
+}

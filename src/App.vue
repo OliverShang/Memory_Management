@@ -2,7 +2,6 @@
   <div id="app">
     <el-container>
       <el-header >
-        <el-space alignment="flex-start">
         <a href="https://github.com/olivershang">
           <el-image src="https://z3.ax1x.com/2021/06/08/2BHRPI.png"
           style="width: 60px; height: 60px; float: left;"
@@ -12,37 +11,46 @@
           内存管理-请求分页分配方式
           <el-link type="info" href="https://github.com/olivershang">说明文档</el-link>
         </div>
-
-        </el-space>
       </el-header>
-      <el-container>
-        <el-aside width="200px"><control_block ref="control_block"></control_block></el-aside>
-        <el-main>
-          <el-space alignment="flex-start">
-            <memory_block  ref="memory_block"></memory_block>
-
-          </el-space>
+      <el-container direction="horizontal">
+        <el-aside width="200px"><control_component ref="control_component"></control_component></el-aside>
+        <el-main direction="horizontal">
+          <div class="div-style">
+            <el-row :gutter="20">
+              <el-col>
+                <div >
+                  <memory_block  ref="memory_block"></memory_block>
+                </div>
+              </el-col>
+              <el-col>
+                <div>
+                  <instruction_table></instruction_table>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
         </el-main>
       </el-container>
-
-
     </el-container>
-
   </div >
 </template>
 
 <script>
-import memory_block from './components/memory_block.vue'
+import memory_block from './components/memory_block.vue';
 import control_component from "@/components/control_component";
+import instruction_table from "@/components/instruction_table";
 
 export default {
   name: 'App',
   components: {
     memory_block,
     control_component,
+    instruction_table,
   },
   data(){
+    return{
 
+    }
   }
 }
 </script>
@@ -85,5 +93,9 @@ body > .el-container {
 
 .el-container:nth-child(7) .el-aside {
   line-height: 320px;
+}
+.div-style{
+  display: flex;
+  justify-content: space-around;
 }
 </style>
