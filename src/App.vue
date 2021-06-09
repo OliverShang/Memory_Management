@@ -1,9 +1,3 @@
-<!--<template>-->
-<!--  <div id="app">-->
-<!--    <img alt="Vue logo" src="./assets/logo.png">-->
-<!--    <HelloWorld msg="Welcome to Your Vue.js App"/>-->
-<!--  </div>-->
-<!--</template>-->
 <template>
   <div id="app">
     <el-container>
@@ -15,22 +9,23 @@
           target="_blank"></el-image>
         </a>
         <div style="float: right; margin-top: 25px">
-       内存管理-请求分页分配方式
-<!--          </span>-->
+          内存管理-请求分页分配方式
           <el-link type="info" href="https://github.com/olivershang">说明文档</el-link>
         </div>
 
         </el-space>
       </el-header>
-      <el-main>
-        <el-space alignment="flex-start">
+      <el-container>
+        <el-aside width="200px"><control_block ref="control_block"></control_block></el-aside>
+        <el-main>
+          <el-space alignment="flex-start">
+            <memory_block  ref="memory_block"></memory_block>
 
-          <memory_block  ref="memory_block"></memory_block>
+          </el-space>
+        </el-main>
+      </el-container>
 
-        </el-space>
 
-
-      </el-main>
     </el-container>
 
   </div >
@@ -38,11 +33,16 @@
 
 <script>
 import memory_block from './components/memory_block.vue'
+import control_component from "@/components/control_component";
 
 export default {
   name: 'App',
   components: {
-    memory_block
+    memory_block,
+    control_component,
+  },
+  data(){
+
   }
 }
 </script>

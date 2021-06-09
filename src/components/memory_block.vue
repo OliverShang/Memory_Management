@@ -6,19 +6,37 @@
   <el-card class="box-card">
     <div slot="header" class="clearfix">
       <span>内存块信息</span>
-<!--      <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>-->
     </div>
-    <div v-for="index in 4" class="text item">
-      <span>{{'内存块 ' + index }}</span>
-      <div>执行指令号：{{}}</div>
-    </div>
+<!--    <div v-for="(block,index) in total_blocks" :key="index" class="text item">-->
+<!--      <span>{{'内存块 ' + (index+1) }}</span>-->
+<!--      <div>内存块状态:{{blocks[index].flag?"占用":"空闲"}} 执行指令号:{{blocks[index].current_instruction}}-->
+<!--        执行页数:{{blocks[index].current_page}}</div>-->
+<!--    </div>-->
+    <el-table :data="blocks" style="width: 100%" stripe>
+      <el-table-column prop="id" label="内存块" width="110" align="center"></el-table-column>
+      <el-table-column prop="state" label="内存块状态" width="110" align="center"></el-table-column>
+      <el-table-column prop="current_instruction" label="执行指令号" width="110" align="center"></el-table-column>
+      <el-table-column prop="current_page" label="执行页数" width="110" align="center"></el-table-column>
+    </el-table>
   </el-card>
 </div>
 </template>
 
-<script>7
+<script>
 export default {
-  name: "memory_block"
+  name: "memory_block",
+  data(){
+    return{
+      total_blocks: 4,
+      blocks: [
+        {id: 1, state: "空闲", current_page: -1, current_instruction: -1},
+        {id: 2, state: "空闲", current_page: -1, current_instruction: -1},
+        {id: 3, state: "空闲", current_page: -1, current_instruction: -1},
+        {id: 4, state: "空闲", current_page: -1, current_instruction: -1},
+      ]
+    }
+
+  },
 }
 </script>
 
