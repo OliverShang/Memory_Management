@@ -38,6 +38,10 @@
       <el-button type="primary" @click="singleStep" size="small" class="buttons" round :disabled="c_finished">单步执行</el-button>
         <el-button type="primary" @click="multipleSteps" size="small" class="buttons" round :disabled="c_finished">连续执行</el-button>
       </div>
+<!--      <div>-->
+<!--        <br>-->
+<!--        <el-button type="success" @click="compareTwoAlgorithms" size="small" class="buttons" round :disabled="c_finished">比较FIFO和LRU</el-button>-->
+<!--      </div>-->
       <div>
         <br>
         <el-button type="warning" @click="reset" size="medium" class="buttons" round>重置</el-button>
@@ -85,6 +89,9 @@ export default {
     },
     multipleSteps(){
       this.$emit('multiple-steps')
+    },
+    compareTwoAlgorithms() {
+      this.$emit('compare-algorithms')
     }
   },
 };

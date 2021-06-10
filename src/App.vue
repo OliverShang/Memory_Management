@@ -18,6 +18,7 @@
           ref="control_component"
           @single-step="executeOneInstruction"
           @multiple-steps="executeAllInstructions"
+          @compare-algorithms="compareAlgorithms"
           :c_executed_percentage="executed_percentage"
           :c_missing_pages="missing_pages"
           :c_missing_page_percentage="missing_page_percentage"
@@ -33,6 +34,7 @@
           </div>
           <div class="charts">
 <!--            TODO: 加入line chart-->
+            <ve-line :data="chartData" :settings="chartSettings"></ve-line>
           </div>
         </el-main>
       </el-container>
@@ -52,6 +54,13 @@ export default {
     instruction_table,
   },
   data(){
+    this.chartSettings = {
+      xAxisType: ['value'],
+      xAxisName: ['指令条数'],
+      yAxisType: ['percent'],
+      yAxisName: ['缺页率'],
+      // metrics: ['缺页率'],
+    }
     return{
       instruction_execution_list: [],
       LRU_memory_allocation: [], //  队头即为最近最久没有使用的页面，如果某页面已在内存中，被使用后则放至队尾
@@ -64,6 +73,12 @@ export default {
       executing: false, //  用于正在连续执行时禁用算法选择
       total_instruction_num: 320,
       timer: '',
+      record_interval: 0,
+      FIFO_ended: false,
+      chartData: {
+        columns: ["指令条数",],
+        rows:[]
+      }
     }
   },
   methods:{
@@ -77,8 +92,8 @@ export default {
       }
       return min+Math.floor(x * (max - min));
     },
-    createTimer() {
-      this.timer = setInterval(this.executeOneInstruction, 8);//  时间单位毫秒
+    createTimer(interval) {
+      this.timer = setInterval(this.executeOneInstruction, interval);//  时间单位毫秒
     },
     generateInstructionOrder() {
          // 生成指令序列
@@ -170,7 +185,7 @@ export default {
       // LRU调页
       if(allocated === false && this.$refs.control_component.choice_algorithm === "LRU"){
         let being_swapped = this.LRU_memory_allocation.length === 4 ? this.LRU_memory_allocation[0] : -1; //  即将被换出的页
-        console.log(being_swapped);
+        // console.log(being_swapped);
         this.$refs.instruction_table.addInstruction(this.current_pointer, this.instruction_execution_list[this.current_pointer], "True", being_swapped);
         if(this.LRU_memory_allocation.length === 4){
           let index_swapped = this.LRU_memory_allocation.indexOf(being_swapped); //  在LRU队列中的序号
@@ -195,18 +210,35 @@ export default {
 
       this.current_pointer++;
       this.computeExecutedPercentage();
+      if(!this.record_interval){
+        let algoo = this.$refs.control_component.choice_algorithm;
+        if(this.chartData.columns.length === 1){
+          this.chartData.columns.push(algoo);
+        }
+        let data = {"指令条数": this.current_pointer};
+        data[algoo] = this.missing_page_percentage / 100;
+        this.chartData.rows.push(data)
+        // console.log(this.chartData.rows);
+      }
+      this.record_interval++;
+      this.record_interval %= 10;
       if(this.checkEnd()){
         this.$notify({title: '成功', message:"指令已执行完成", type: "success"});
         this.executing = false;
         this.finished = true;
+        if(this.$refs.control_component.choice_algorithm === "FIFO"){
+          // console.log("true")
+          this.FIFO_ended = true;
+        }
         clearInterval(this.timer);
         return;
       }
+
     },
     executeAllInstructions() {
       this.executing = true;
       if(!this.checkEnd()){
-        this.createTimer();
+        this.createTimer(50);
       }
     },
     checkEnd() {
@@ -231,7 +263,28 @@ export default {
         this.missing_page_percentage = Math.floor(this.missing_pages * 100 / this.current_pointer);
       }
     },
+    // compareAlgorithms(){
+    //   this.current_pointer = 0;
+    //   this.executing = true;
+    //   this.$refs.control_component.choice_algorithm = "FIFO";
+    //   if(!this.checkEnd()){
+    //     this.createTimer(25);
+    //   }
+    //   this.timer2 = setTimeout(this.secondExecution, 1000 * 10 );
+    // },
+    // secondExecution(){
+    //   console.log("2222222222")
+    //   this.current_pointer = 0;
+    //   this.executed_percentage = 0; //  已执行的指令比例
+    //   this.missing_pages = 0; // 缺页总数
+    //   this.missing_page_percentage = 0;//  缺页百分比
+    //   this.$refs.control_component.choice_algorithm = "LRU";
+    //   if(!this.checkEnd()){
+    //     this.createTimer(25);
+    //   }
+    // }
   },
+
 
   mounted() {
     this.generateInstructionOrder();
@@ -286,5 +339,10 @@ body > .el-container {
   display: flex;
   justify-content: space-around;
   align-items: center;
+}
+
+.charts{
+  margin-top: 50px;
+  max-width: 800px;
 }
 </style>
