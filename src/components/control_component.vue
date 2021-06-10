@@ -10,7 +10,6 @@
           <el-progress :percentage="executed_percentage" :color="colorScheme"></el-progress>
           {{executed_percentage}}
         </div>
-<!--        <div>正在执行的指令:{{current_instruction}}</div>-->
       </div>
     </div>
     <el-divider><i class="el-icon-s-data"></i></el-divider>
@@ -36,13 +35,12 @@
       <br/>
       <el-divider></el-divider>
       <div>
-      <el-button type="primary" size="small" class="buttons" round>单步执行</el-button>
-
+      <el-button type="primary" @click="singleStep" size="small" class="buttons" round>单步执行</el-button>
       <el-button type="primary" size="small" class="buttons" round>连续执行</el-button>
       </div>
       <div>
         <br>
-        <el-button type="warning" @click="reset" size="midium" class="buttons"  round>重置</el-button>
+        <el-button type="warning" @click="reset" size="medium" class="buttons" round>重置</el-button>
       </div>
 
     </div>
@@ -73,7 +71,7 @@ export default {
     }
   },
   methods: {
-    colorScheme: (percentage)=>{
+    colorScheme(percentage) {
       if (percentage < 30){
         return '#909399'
       } else if (percentage < 70){
@@ -82,16 +80,16 @@ export default {
         return '#67c23a'
       }
     },
-    missingPageIncrement: ()=>{
+    missingPageIncrement() {
       this.pages_missing++;
     },
-    instructionIncrement: ()=>{
+    instructionIncrement() {
       this.executed_instruction_num++;
     },
-    computeExecutedPercentage: ()=>{
+    computeExecutedPercentage() {
       this.executed_percentage = Math.floor(this.executed_instruction_num * 100 / this.total_instruction_num);
     },
-    computeMissingPagePercentage: ()=>{
+    computeMissingPagePercentage() {
       if(this.executed_instruction_num===0){
         this.missing_page_percentage=0;
       }
@@ -99,10 +97,16 @@ export default {
       this.missing_page_percentage = Math.floor(this.pages_missing * 100 / this.executed_instruction_num);
       }
     },
-    reset: ()=>{
+    reset() {
       location.reload();
+    },
+    singleStep() {
+      // console.log(this);
+      this.$emit('single-step');
+      // console.log(this.choice_algorithm);
+      // this.executeOneInstruction();
     }
-  }
+  },
 };
 </script>
 

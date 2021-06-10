@@ -2,7 +2,7 @@
   <div class="instruction_table">
     <el-card shadow="hover">
 
-      <el-table :data="instruction_table_data" stripe style="width: 100%" max-height="340px">
+      <el-table :data="instruction_table_data" stripe style="width: 100%" max-height="295px">
         <el-table-column prop="index" label="序号" align="center"></el-table-column>
         <el-table-column prop="instruction_id" label="指令" align="center"></el-table-column>
         <el-table-column prop="missing_page" label="缺页" align="center"></el-table-column>
