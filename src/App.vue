@@ -16,18 +16,8 @@
         <el-aside width="200px"><control_component ref="control_component"></control_component></el-aside>
         <el-main direction="horizontal">
           <div class="div-style">
-            <el-row :gutter="20">
-              <el-col>
-                <div >
-                  <memory_block  ref="memory_block"></memory_block>
-                </div>
-              </el-col>
-              <el-col>
-                <div>
-                  <instruction_table></instruction_table>
-                </div>
-              </el-col>
-            </el-row>
+            <memory_block  ref="memory_block"></memory_block>
+            <instruction_table ref="instruction_table"></instruction_table>
           </div>
         </el-main>
       </el-container>
@@ -49,7 +39,97 @@ export default {
   },
   data(){
     return{
+      instruction_execution_list:[],
+      page_history:[],
+      current_pointer: 0,
+      FIFO_pointer: 0,
+    }
+  },
+  methods:{
+    //  产生[min,max)间的随机数
+    randIntBetween: (min,max)=>{
+      //  Math.random() 为0~1的随机数
+      let x = Math.random();
+      // 保持左闭右开
+      while(x===1){
+        x = Math.random();
+      }
+      return min+Math.floor(x * (max - min));
+    },
+    createTimer: ()=>{
+      this.timer = setInterval(this.executeOneInstruction, 120);//  时间单位毫秒
+    },
+    generateInstructionOrder: ()=>{
+      // 生成指令序列
+      let start_point = this.randIntBetween(Math.floor(this.$refs.control_component.total_instruction_num / 3), Math.floor(this.$refs.control_component.total_instruction_num * 2 / 3));
+      let pointer = 1;
+      this.instruction_execution_list.append(start_point);
+      pointer += 1;
+      if(pointer <= this.$refs.control_component.total_instruction_num){
+        this.instruction_execution_list.append(start_point + 1);
+        pointer += 1;
+      }
+      while(pointer < this.$refs.control_component.total_instruction_num){
+        let tmp = this.randIntBetween(0, start_point-1);
+        while((tmp in this.instruction_execution_list)){
+          tmp = this.randIntBetween(0, start_point-1);
+        }
+        this.instruction_execution_list.append(tmp);
+        pointer += 1;
+        if(pointer > this.$refs.control_component.total_instruction_num){
+          break;
+        }
 
+        this.instruction_execution_list.append(tmp + 1);
+        pointer += 1;
+        if(pointer > this.$refs.control_component.total_instruction_num){
+          break;
+        }
+
+        tmp = this.randIntBetween(start_point + 1, this.$refs.control_component.total_instruction_num - 2);
+        while(tmp in this.instruction_execution_list){
+          tmp = this.randIntBetween(start_point + 1, this.$refs.control_component.total_instruction_num - 2);
+        }
+        this.instruction_execution_list.append(tmp);
+        pointer += 1;
+        if(pointer > this.$refs.control_component.total_instruction_num){
+          break;
+        }
+
+        this.instruction_execution_list.append(tmp + 1);
+        pointer += 1;
+        if(pointer > this.$refs.control_component.total_instruction_num){
+          break;
+        }
+
+      }
+      },
+    executeOneInstruction: ()=>{
+      let logical_page = Math.floor(this.instruction_execution_list[this.current_pointer] / this.$refs.memory_block.page_instruction_num); //  指令所在的逻辑页号
+      console.log("第"+this.instruction_execution_list[this.current_pointer].toString()+"条指令的所在页面为"+logical_page.toString());
+      let allocated = false;
+      for (let physical_page of this.$refs.memory_block.blocks){
+        if(logical_page === physical_page.current_page){
+          allocated = true;
+          console.log("第"+logical_page.toString()+"已在内存中！");
+        }
+      }
+      // FIFO调页
+      if(allocated === false && this.$refs.control_component.choice_algorithm==="FIFO"){
+        this.$refs.instruction_table.addInstruction(this.current_pointer, this.instruction_execution_list[this.current_pointer], logical_page, this.$refs.memory_block.blocks[this.FIFO_pointer].current_page);
+        this.$refs.memory_block.blocks[this.FIFO_pointer].state = "占用";
+        this.$refs.memory_block.blocks[this.FIFO_pointer].current_page = logical_page;
+        this.$refs.memory_block.blocks[this.FIFO_pointer].current_instruction = this.instruction_execution_list[this.current_pointer];
+        this.FIFO_pointer++;
+      }
+      // LRU调页
+    },
+    checkEnd: ()=>{
+      if(this.current_pointer < this.$refs.control_componIent.total_instruction_num){
+        return false;
+      }
+      console.log("全部指令执行完成！");
+      return true;
     }
   }
 }
@@ -97,5 +177,6 @@ body > .el-container {
 .div-style{
   display: flex;
   justify-content: space-around;
+  align-items: center;
 }
 </style>

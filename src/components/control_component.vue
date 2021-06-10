@@ -5,7 +5,11 @@
       <div class="item_name">
         <div>作业指令总数:{{total_instruction_num}}</div>
         <el-divider></el-divider>
-        <div>已执行指令数:{{executed_instruction_num}}</div>
+        <div>执行进度</div>
+        <div>
+          <el-progress :percentage="executed_percentage" :color="colorScheme"></el-progress>
+          {{executed_percentage}}
+        </div>
 <!--        <div>正在执行的指令:{{current_instruction}}</div>-->
       </div>
     </div>
@@ -38,7 +42,7 @@
       </div>
       <div>
         <br>
-        <el-button type="warning" size="midium" class="buttons" round>重置</el-button>
+        <el-button type="warning" @click="reset" size="midium" class="buttons"  round>重置</el-button>
       </div>
 
     </div>
@@ -51,8 +55,8 @@ export default {
   data(){
     return{
       total_instruction_num: 320,
-      current_instruction: 0,
       executed_instruction_num: 0,
+      executed_percentage: 0,
       algorithms: [
         {
           algorithm_id: 0,
@@ -67,8 +71,39 @@ export default {
       pages_missing: 0,
       missing_page_percentage: 0,//百分数
     }
+  },
+  methods: {
+    colorScheme: (percentage)=>{
+      if (percentage < 30){
+        return '#909399'
+      } else if (percentage < 70){
+        return '#e6a23c'
+      } else{
+        return '#67c23a'
+      }
+    },
+    missingPageIncrement: ()=>{
+      this.pages_missing++;
+    },
+    instructionIncrement: ()=>{
+      this.executed_instruction_num++;
+    },
+    computeExecutedPercentage: ()=>{
+      this.executed_percentage = Math.floor(this.executed_instruction_num * 100 / this.total_instruction_num);
+    },
+    computeMissingPagePercentage: ()=>{
+      if(this.executed_instruction_num===0){
+        this.missing_page_percentage=0;
+      }
+      else{
+      this.missing_page_percentage = Math.floor(this.pages_missing * 100 / this.executed_instruction_num);
+      }
+    },
+    reset: ()=>{
+      location.reload();
+    }
   }
-}
+};
 </script>
 
 <style scoped>
