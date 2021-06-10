@@ -12,16 +12,27 @@
           <el-link type="info" href="https://github.com/olivershang">说明文档</el-link>
         </div>
       </el-header>
-      <el-container direction="horizontal">
+      <el-container >
         <el-aside width="200px">
-          <control_component ref="control_component" @single-step="executeOneInstruction">
+          <control_component
+          ref="control_component"
+          @single-step="executeOneInstruction"
+          @multiple-steps="executeAllInstructions"
+          :c_executed_percentage="executed_percentage"
+          :c_missing_pages="missing_pages"
+          :c_missing_page_percentage="missing_page_percentage"
+          :c_executing="executing"
+          :c_finished="finished">
 
           </control_component>
         </el-aside>
-        <el-main direction="horizontal">
+        <el-main direction="horizontal" >
           <div class="div-style">
             <memory_block  ref="memory_block"></memory_block>
             <instruction_table ref="instruction_table"></instruction_table>
+          </div>
+          <div class="charts">
+<!--            TODO: 加入line chart-->
           </div>
         </el-main>
       </el-container>
@@ -33,7 +44,6 @@
 import memory_block from './components/memory_block.vue';
 import control_component from "@/components/control_component";
 import instruction_table from "@/components/instruction_table";
-
 export default {
   name: 'App',
   components: {
@@ -43,14 +53,18 @@ export default {
   },
   data(){
     return{
-      instruction_execution_list:[],
-      page_history:[],
-      current_pointer: 0,
-      FIFO_pointer: 0,
+      instruction_execution_list: [],
+      LRU_memory_allocation: [], //  队头即为最近最久没有使用的页面，如果某页面已在内存中，被使用后则放至队尾
+      current_pointer: 0, //  已执行的指令条数
+      FIFO_pointer: 0, //  用来记录队列
+      executed_percentage: 0, //  已执行的指令比例
+      missing_pages: 0, // 缺页总数
+      missing_page_percentage: 0, //  缺页百分比
+      finished: false, //  是否全部完成，用于设置按钮是否禁用
+      executing: false, //  用于正在连续执行时禁用算法选择
+      total_instruction_num: 320,
+      timer: '',
     }
-  },
-  created() {
-
   },
   methods:{
     //  产生[min,max)间的随机数
@@ -63,8 +77,8 @@ export default {
       }
       return min+Math.floor(x * (max - min));
     },
-    createTimer: ()=>{
-      this.timer = setInterval(this.executeOneInstruction, 120);//  时间单位毫秒
+    createTimer() {
+      this.timer = setInterval(this.executeOneInstruction, 8);//  时间单位毫秒
     },
     generateInstructionOrder() {
          // 生成指令序列
@@ -116,29 +130,83 @@ export default {
       let allocated = false;
       // 检测需要的页是否在内存中
       for (let physical_page of this.$refs.memory_block.blocks){
-        // console.log(physical_page);
         if(logical_page === physical_page.current_page){
           allocated = true;
           console.log("第"+logical_page+"页已在内存中！");
         }
       }
-      // FIFO正常执行
-      if(allocated === true && this.$refs.control_component.choice_algorithm==="FIFO"){
-        this.$refs.instruction_table.addInstruction(this.current_pointer, this.instruction_execution_list[this.current_pointer], "False",this.$refs.memory_block.blocks[this.FIFO_pointer].current_page);
+
+      // 发生缺页
+      if(allocated === false){
+        // console.log(this);
+        this.missingPageIncrement();
+        this.computeMissingPagePercentage();
       }
+
+      // FIFO正常执行
+      if(allocated === true && this.$refs.control_component.choice_algorithm === "FIFO"){
+        this.$refs.instruction_table.addInstruction(this.current_pointer, this.instruction_execution_list[this.current_pointer], "False",-1);
+      }
+
       // FIFO调页
-      if(allocated === false && this.$refs.control_component.choice_algorithm==="FIFO"){
+      if(allocated === false && this.$refs.control_component.choice_algorithm === "FIFO"){
         this.$refs.instruction_table.addInstruction(this.current_pointer, this.instruction_execution_list[this.current_pointer], "True", this.$refs.memory_block.blocks[this.FIFO_pointer].current_page);
         this.$refs.memory_block.blocks[this.FIFO_pointer].state = "占用";
         this.$refs.memory_block.blocks[this.FIFO_pointer].current_page = logical_page;
         this.$refs.memory_block.blocks[this.FIFO_pointer].current_instruction = this.instruction_execution_list[this.current_pointer];
         this.FIFO_pointer++;
+        this.FIFO_pointer = this.FIFO_pointer % 4;
+      }
+
+      //  LRU正常执行
+      if(allocated === true && this.$refs.control_component.choice_algorithm === "LRU"){
+        // 如果该页已经在内存中，则将其调整到数组尾部(被使用)
+        let index = this.LRU_memory_allocation.indexOf(logical_page);
+        this.LRU_memory_allocation.splice(index, 1);
+        this.LRU_memory_allocation.push(logical_page);
+        this.$refs.instruction_table.addInstruction(this.current_pointer, this.instruction_execution_list[this.current_pointer], "False", -1);
+
       }
       // LRU调页
+      if(allocated === false && this.$refs.control_component.choice_algorithm === "LRU"){
+        let being_swapped = this.LRU_memory_allocation.length === 4 ? this.LRU_memory_allocation[0] : -1; //  即将被换出的页
+        console.log(being_swapped);
+        this.$refs.instruction_table.addInstruction(this.current_pointer, this.instruction_execution_list[this.current_pointer], "True", being_swapped);
+        if(this.LRU_memory_allocation.length === 4){
+          let index_swapped = this.LRU_memory_allocation.indexOf(being_swapped); //  在LRU队列中的序号
+          this.LRU_memory_allocation.splice(index_swapped, 1);
+          this.LRU_memory_allocation.push(logical_page);
+        }
+        else{
+          this.LRU_memory_allocation.push(logical_page);
+        }
+
+        let index = -1; //  要换的页的物理地址
+        for(let idx in this.$refs.memory_block.blocks){
+          if(being_swapped === this.$refs.memory_block.blocks[idx].current_page){
+            index = idx;
+            break;
+          }
+        }
+        this.$refs.memory_block.blocks[index].state="占用";
+        this.$refs.memory_block.blocks[index].current_page = logical_page;
+        this.$refs.memory_block.blocks[index].current_instruction = this.instruction_execution_list[this.current_pointer];
+      }
 
       this.current_pointer++;
+      this.computeExecutedPercentage();
       if(this.checkEnd()){
         this.$notify({title: '成功', message:"指令已执行完成", type: "success"});
+        this.executing = false;
+        this.finished = true;
+        clearInterval(this.timer);
+        return;
+      }
+    },
+    executeAllInstructions() {
+      this.executing = true;
+      if(!this.checkEnd()){
+        this.createTimer();
       }
     },
     checkEnd() {
@@ -146,9 +214,25 @@ export default {
         return false;
       }
       console.log("全部指令执行完成！");
+      this.finished = true;
       return true;
-    }
+    },
+    missingPageIncrement() {
+      this.missing_pages++;
+    },
+    computeExecutedPercentage() {
+      this.executed_percentage = Math.floor(this.current_pointer * 100 / this.total_instruction_num);
+    },
+    computeMissingPagePercentage() {
+      if(this.current_pointer===0){
+        this.missing_page_percentage=0;
+      }
+      else{
+        this.missing_page_percentage = Math.floor(this.missing_pages * 100 / this.current_pointer);
+      }
+    },
   },
+
   mounted() {
     this.generateInstructionOrder();
   }
@@ -173,6 +257,10 @@ export default {
 
 .el-container{
   margin-top: 15px;
+}
+
+.el-aside{
+  width: 580px;
 }
 .el-main {
   background-color: #efefef;
