@@ -237,6 +237,7 @@ export default {
     },
     executeAllInstructions() {
       this.executing = true;
+      this.finished = true;
       if(!this.checkEnd()){
         this.createTimer(50);
       }
