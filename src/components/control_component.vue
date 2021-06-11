@@ -4,9 +4,9 @@
     <div class="delineated">
 <!--      TODO: 加入style-->
       <div >
-        <div class="item_name1">作业指令总数:{{total_instruction_num}}</div>
+        <div class="item_name1"> <span class="text">作业指令总数:{{total_instruction_num}}</span></div>
         <el-divider></el-divider>
-        <div class="item_name2">执行进度</div>
+        <div class="item_name2"> <span class="text">执行进度</span></div>
         <div class="item_name2">
           <el-progress :percentage="c_executed_percentage" :color="colorScheme"></el-progress>
         </div>
@@ -15,15 +15,15 @@
     <el-divider><i class="el-icon-s-data"></i></el-divider>
     <div class="delineated">
       <div>
-        <div class="item_name1">缺页数:{{c_missing_pages}}</div>
+        <div class="item_name1"><span class="text">缺页数:{{c_missing_pages}}</span></div>
         <el-divider></el-divider>
-        <div class="item_name2">缺页率:{{c_missing_page_percentage}}%</div>
+        <div class="item_name2"> <span class="text">缺页率:{{c_missing_page_percentage}}%</span></div>
       </div>
     </div>
     <el-divider><i class="el-icon-cpu"></i></el-divider>
 
     <div class="delineated">
-      <div class="item_name1" >置换算法</div>
+      <div class="item_name1" > <span class="text">置换算法</span></div>
       <el-select v-model="choice_algorithm" placeholder="请选择置换算法" :disabled="c_executing">
         <el-option
             v-for="algo in algorithms"
@@ -123,5 +123,11 @@ export default {
 
 .item_name2{
   margin-bottom: 10px;
+}
+
+.text{
+  font-size: medium;
+  font-family: "PingFang SC";
+  font-weight: bold;
 }
 </style>
