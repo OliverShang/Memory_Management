@@ -2,14 +2,14 @@
   <div id="app">
     <el-container>
       <el-header >
-        <a href="https://github.com/olivershang">
+        <a href="https://github.com/OliverShang/Memory_Management/tree/master">
           <el-image src="https://z3.ax1x.com/2021/06/08/2BHRPI.png"
           style="width: 60px; height: 60px; float: left;"
           target="_blank"></el-image>
         </a>
         <div style="float: right; margin-top: 25px">
           内存管理-请求分页分配方式
-          <el-link type="info" href="https://github.com/olivershang">说明文档</el-link>
+          <el-link type="info" @click="openIntroduction">说明</el-link>
         </div>
       </el-header>
       <el-container >
@@ -32,9 +32,9 @@
             <memory_block  ref="memory_block"></memory_block>
             <instruction_table ref="instruction_table"></instruction_table>
           </div>
-          <div class="charts">
+          <div class="outer-chart">
 <!--            TODO: 加入line chart-->
-            <ve-line :data="chartData" :settings="chartSettings"></ve-line>
+            <ve-line :data="chartData" :settings="chartSettings" class="charts"></ve-line>
           </div>
         </el-main>
       </el-container>
@@ -283,6 +283,13 @@ export default {
     //     this.createTimer(25);
     //   }
     // }
+    openIntroduction() {
+        this.$alert(`<h3 style="align-text: center">操作系统内存调度项目说明</h3>该项目的目的是模拟计算机操作系统<b>请求分页分配</b>请求分页分配的方式。左侧下拉菜单可选择调页算法，点击<b>单步执行</b>或<b>连续执行</b>执行指令。
+        `, {
+          confirmButtonText: '好的',
+          dangerouslyUseHTMLString: true,
+        })
+    },
   },
 
 
@@ -343,6 +350,17 @@ body > .el-container {
 
 .charts{
   margin-top: 50px;
-  max-width: 800px;
+  margin-right: 50px;
+  width: 800px;
+
+}
+
+.outer-chart{
+  margin-top: 50px;
+  background-color: rgba(255, 255, 255, 0.29);
+  border-width: 2px;
+  border-radius: 4px;
+  border-style: groove;
+  border-color: rgb(170, 170, 177);
 }
 </style>

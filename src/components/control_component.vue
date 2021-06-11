@@ -3,27 +3,27 @@
     <el-divider><i class="el-icon-s-data"></i></el-divider>
     <div class="delineated">
 <!--      TODO: 加入style-->
-      <div class="item_name">
-        <div>作业指令总数:{{total_instruction_num}}</div>
+      <div >
+        <div class="item_name1">作业指令总数:{{total_instruction_num}}</div>
         <el-divider></el-divider>
-        <div>执行进度</div>
-        <div>
+        <div class="item_name2">执行进度</div>
+        <div class="item_name2">
           <el-progress :percentage="c_executed_percentage" :color="colorScheme"></el-progress>
         </div>
       </div>
     </div>
     <el-divider><i class="el-icon-s-data"></i></el-divider>
     <div class="delineated">
-      <div class="item_name">
-        <div>缺页数:{{c_missing_pages}}</div>
+      <div>
+        <div class="item_name1">缺页数:{{c_missing_pages}}</div>
         <el-divider></el-divider>
-        <div>缺页率:{{c_missing_page_percentage}}%</div>
+        <div class="item_name2">缺页率:{{c_missing_page_percentage}}%</div>
       </div>
     </div>
     <el-divider><i class="el-icon-cpu"></i></el-divider>
 
     <div class="delineated">
-      <div class="item_name">置换算法</div>
+      <div class="item_name1" >置换算法</div>
       <el-select v-model="choice_algorithm" placeholder="请选择置换算法" :disabled="c_executing">
         <el-option
             v-for="algo in algorithms"
@@ -33,7 +33,7 @@
         </el-option>
       </el-select>
       <br/>
-      <el-divider></el-divider>
+      <el-divider><i class="el-icon-cpu"></i></el-divider>
       <div>
       <el-button type="primary" @click="singleStep" size="small" class="buttons" round :disabled="c_finished">单步执行</el-button>
         <el-button type="primary" @click="multipleSteps" size="small" class="buttons" round :disabled="c_finished">连续执行</el-button>
@@ -42,7 +42,7 @@
 <!--        <br>-->
 <!--        <el-button type="success" @click="compareTwoAlgorithms" size="small" class="buttons" round :disabled="c_finished">比较FIFO和LRU</el-button>-->
 <!--      </div>-->
-      <div>
+      <div class="item_name2">
         <br>
         <el-button type="warning" @click="reset" size="medium" class="buttons" round>重置</el-button>
       </div>
@@ -109,5 +109,19 @@ export default {
 
 }
 
+.delineated{
+  border-width: 2px;
+  border-radius: 4px;
+  border-style: groove;
+  border-color: rgb(170, 170, 177);
+}
 
+.item_name1{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.item_name2{
+  margin-bottom: 10px;
+}
 </style>

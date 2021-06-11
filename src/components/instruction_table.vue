@@ -1,6 +1,6 @@
 <template>
   <div class="instruction_table">
-    <el-card shadow="hover">
+    <el-card shadow="hover" class="box-card">
 
       <el-table :data="instruction_table_data" stripe style="width: 100%" max-height="295px">
         <el-table-column prop="index" label="序号" align="center"></el-table-column>
@@ -32,6 +32,16 @@ export default {
 .instruction_table{
   width:50%;
 }
-el-card{
+
+.box-card{
+  background-color: rgba(255, 255, 255, 0.29);
+}
+
+.instruction_table {
+  background-color: rgba(255, 255, 255, 0.29);
+  border-width: 2px;
+  border-radius: 4px;
+  border-style: groove;
+  border-color: rgb(170, 170, 177);
 }
 </style>

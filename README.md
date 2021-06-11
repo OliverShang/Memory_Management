@@ -1,6 +1,11 @@
-# memory_management
+# Memory_Management
+
+## Online Preview
+
+[Click_Here]([MemoryManagement-OS Coursework (olivershang.github.io)](https://olivershang.github.io/Memory_Management/))
 
 ## Project setup
+
 ```
 npm install
 ```

@@ -1,9 +1,9 @@
 <template>
 <!--用于显示4个内存块的状态-->
-<div>
+<div class="memory-block">
 <!--  <span>内存块</span>-->
 <!--  <h4 id="title" >内存块</h4>-->
-  <el-card class="box-card" shadow="hover">
+  <el-card class="box-card" shadow="hover" style="background-color: rgba(255, 255, 255, 0.29)">
     <div slot="header" class="clearfix">
       <span>内存块信息</span>
     </div>
@@ -63,5 +63,12 @@ export default {
 .box-card {
   width: 480px;
   /*height: 200px;*/
+}
+
+.memory-block{
+  border-width: 2px;
+  border-radius: 4px;
+  border-style: groove;
+  border-color: rgb(170, 170, 177);
 }
 </style>
