@@ -2,7 +2,7 @@
 
 ## Online Preview
 
-[Click_Here]([MemoryManagement-OS Coursework (olivershang.github.io)](https://olivershang.github.io/Memory_Management/))
+[Click_Here](https://olivershang.github.io/Memory_Management/)
 
 ## Project setup
 
